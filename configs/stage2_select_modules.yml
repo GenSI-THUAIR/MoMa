@@ -1,0 +1,219 @@
+# yaml-language-server: $schema=../ocpmodels/trainers/ft/config.OCPConfig.schema.json
+trainer: embed_gen
+
+logger: wandb
+# gpus: 6
+noddp: false
+slurm: {}
+seed: 0
+
+task:
+  ft:
+  base_checkpoint:
+    src: ./jmp-l.pt
+    ignore_keys_patterns: ["*module_dict.*"]
+  freeze_backbone: False
+
+  # configs for stage 2
+  data_name: 1
+  load_modules: True
+  load_full_module: True
+  module_base_path: ./hub
+  module_embeddings_save_path: ./outputs/embeddings
+  labels_save_path: ./outputs/labels
+  selected_modules: []
+  freeze_modules: False
+  module_select: False
+
+dataset:
+  mt_transform: ocpmodels.trainers.ft.transform.matbench_transform
+  # mt_transform: ocpmodels.trainers.ft.transform.qm9_transform # for non-periodic data
+  normalization:
+    y:
+      mean: 1
+      std: 1
+  train:
+    config:
+      format: lmdb
+      src: /train
+  val:
+    - config:
+        src: /val
+  test:
+    - config:
+        src: /test
+
+loss_functions:
+  - y:
+      fn: mae
+      coefficient: 1
+
+evaluation_metrics:
+  metrics:
+    y:
+      - mae
+  primary_metric: y_mae
+
+outputs:
+  y:
+    shape: 1
+    level: system
+    custom_head: True
+    num_layers: 4
+    aggregate: mean
+    num_routers: 1
+    num_modules: 72
+    module_dim: 512
+    moe: True
+    e_layers: 4
+    r_layers: 2
+    sparse: True
+    top_k: 2
+    module_masking: True
+    module_idx: []
+
+model:
+  name: gemnet_oc_mt
+  num_spherical: 7
+  num_radial: 128
+  num_blocks: 6
+  emb_size_atom: 256
+  emb_size_edge: 1024
+  emb_size_trip_in: 64
+  emb_size_trip_out: 128
+  emb_size_quad_in: 64
+  emb_size_quad_out: 32
+  emb_size_aint_in: 64
+  emb_size_aint_out: 64
+  emb_size_rbf: 32
+  emb_size_cbf: 16
+  emb_size_sbf: 64
+  num_before_skip: 2
+  num_after_skip: 2
+  num_concat: 4
+  num_atom: 3
+  num_output_afteratom: 3
+  cutoff: 12.0
+  cutoff_qint: 12.0
+  cutoff_aeaint: 12.0
+  cutoff_aint: 12.0
+  max_neighbors: 30
+  max_neighbors_qint: 8
+  max_neighbors_aeaint: 20
+  max_neighbors_aint: 1000
+  rbf:
+    name: gaussian
+  envelope:
+    name: polynomial
+    exponent: 5
+  cbf:
+    name: spherical_harmonics
+  sbf:
+    name: legendre_outer
+  extensive: True
+  output_init: HeOrthogonal
+  activation: silu
+  scale_file: configs/fm_scale_files/large.pt
+
+  # regress_forces: True
+  # direct_forces: True
+  regress_forces: False
+  direct_forces: False
+  forces_coupled: False
+
+  quad_interaction: True
+  atom_edge_interaction: True
+  edge_atom_interaction: True
+  atom_interaction: True
+
+  num_atom_emb_layers: 2
+  num_global_out_layers: 2
+  qint_tags: [1, 2]
+
+  # new keys for ft trainer
+  absolute_rbf_cutoff: 12.0
+  otf_graph: True
+  ln: False
+  edge_dropout: 0
+  dropout: 0
+
+optim:
+  batch_size: 16
+  eval_batch_size: 16
+  load_balancing: atoms
+  eval_every: 100
+  num_workers: 2
+  max_epochs: 300
+  clip_grad_norm: 10
+
+  # optim_mode: single_group
+  # optimizer:
+  #   name: AdamW
+  #   lr: 5.e-4
+  #   amsgrad: True
+  #   weight_decay: 0.01
+
+  # # lr_scheduler:
+  # #   name: ReduceLROnPlateau
+  # #   mode: min
+  # #   factor: 0.8
+  # #   patience: 3
+
+  # # lr_scheduler:
+  # #   name: WarmupCosineDecayRLP
+  # #   warmup_duration: [100, steps]
+  # #   warmup_factor: 1.0e-3
+  # #   decay_duration: [1000, steps]
+  # #   decay_factor: 0.1
+
+  # lr_scheduler:
+  #   name: WarmupCosineDecayRLP
+  #   warmup_duration: [100, steps]
+  #   warmup_factor: 1.0e-3
+  #   decay_duration: [1000, steps]
+  #   decay_factor: 0.1
+
+  #   rlp:
+  #     mode: min
+  #     factor: 0.8
+  #     patience: 3
+
+  # exponential_moving_average:
+  #   decay: 0.999
+
+  # optim_mode: multi_group
+  optim_mode: single_group
+  optimizer:
+    name: AdamW
+    # lr: 5.e-4
+    lr: 8.e-5
+    amsgrad: True
+    # weight_decay: 0.01
+    weight_decay: 0.1
+
+  lr_scheduler:
+    name: WarmupCosineDecayRLP
+    # warmup_duration: [100, steps]
+    warmup_duration: [5, epochs]
+    # warmup_factor: 1.0e-3
+    warmup_factor: 1.0e-1
+    # decay_duration: [1000, steps]
+    decay_duration: [32, epochs]
+    decay_factor: 0.1
+
+    rlp:
+      mode: min
+      # factor: 0.8
+      factor: 0.1
+      # patience: 3
+      patience: 5
+
+  exponential_moving_average:
+    # decay: 0.999
+    decay: 0.99
+
+  # groups:
+  #   - parameter_patterns: ["*modules*"]
+  #     optimizer:
+  #       lr: 8.e-6
+  #   - parameter_patterns: ["*"]

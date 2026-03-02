@@ -1,0 +1,19 @@
+{
+    "piezoelectric_tensor": "2,4,5,9,10,11,12,13,15,16,17",
+    "expt_eform": "0,1,10,11,13,14,15,16,17",
+    "mp_poly_total": "1,7,9,17",
+    "mp_poisson_ratio": "0,10,12,14,16,17",
+    "jarvis_2d_dielectric_opt": "2,5,9,13,17",
+    "jarvis_2d_eform": "0,2,5,7,9,11,14,17",
+    "jarvis_2d_exfoliation": "9,12,15,16",
+    "jarvis_2d_gap_opt": "0,1,9,12,13,15",
+    "mp_elastic_anisotropy": "15",
+    "mp_eps_electronic": "1,4,9,13,14,17",
+    "mp_eps_total": "1,9,13,17",
+    "mp_phonons": "0,11,12,13,14,15,16,17",
+    "mp_poly_electronic": "1,7,17",
+    "expt_bandgap": "0,1,9,12,13,14,17",
+    "jarvis_3d_eps_tbmbj": "0,1,5,7,8,10,11,14,15,16,17",
+    "jarvis_3d_gap_tbmbj": "1,2,4,8,12,13,14,17",
+    "mp_dielectric": "0,1,4,5,9,12,13,15,17"
+}

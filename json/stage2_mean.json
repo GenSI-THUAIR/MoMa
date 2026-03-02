@@ -1,0 +1,22 @@
+{
+    "jarvis_2d_exfoliation": 112.48130724996331,
+    "mp_phonons": 6.105753420860559,
+    "mp_dielectric": 0.7871399132348564,
+    "mp_poly_total": 14.782075829383887,
+    "piezoelectric_tensor": 0.3924155584385326,
+    "jarvis_2d_eform": -0.8437290015847861,
+    "mp_eps_electronic": 1.7882257100758587,
+    "jarvis_3d_gap_tbmbj": 2.5463653055668978,
+    "mp_poly_electronic": 7.249981042654029,
+    "jarvis_3d_eps_tbmbj": 28.30301688220177,
+    "jarvis_2d_gap_tbmbj": 20.731211944444443,
+    "mp_elastic_anisotropy": 2.146508894621837,
+    "jarvis_2d_dielectric_opt": 6.20647343550447,
+    "expt_eform": -1.0934623749248236,
+    "jarvis_2d_gap_opt": 1.3973823416506719,
+    "jarvis_2d_dielectric_tbmbj": 20.731211944444446,
+    "expt_bandgap": 1.0410967741935484,
+    "mp_poisson_ratio": 0.28737452421303306,
+    "mp_eps_total": 2.611576689673943,
+    "data_catalyst_229": 17.948911587156353
+}

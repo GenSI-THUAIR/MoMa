@@ -1,0 +1,19 @@
+{
+    "piezoelectric_tensor": 6,
+    "expt_eform": 7,
+    "mp_poly_total": 6,
+    "mp_poisson_ratio": 8,
+    "jarvis_2d_dielectric_opt": 5,
+    "jarvis_2d_eform": 6,
+    "jarvis_2d_exfoliation": 5,
+    "jarvis_2d_gap_opt": 5,
+    "mp_elastic_anisotropy": 1,
+    "mp_eps_electronic": 7,
+    "mp_eps_total": 8,
+    "mp_phonons": 8,
+    "mp_poly_electronic": 6,
+    "expt_bandgap": 7,
+    "jarvis_3d_eps_tbmbj": 11,
+    "jarvis_3d_gap_tbmbj": 5,
+    "mp_dielectric": 6
+}

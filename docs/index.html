@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MoMa: A Modular Deep Learning Framework for Material Property Prediction - ICLR 2026">
+    <meta name="keywords" content="MoMa, modular learning, material property prediction, materials science, deep learning, ICLR 2026">
+    <title>MoMa: Modular Learning for Materials</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --primary-light: #14b8a6;
+            --text: #1f2937;
+            --text-light: #4b5563;
+            --text-muted: #6b7280;
+            --bg: #ffffff;
+            --bg-alt: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #f0fdfa 100%);
+            padding: 4.5rem 2rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(13,148,136,0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(20,184,166,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        header > * { position: relative; z-index: 1; }
+
+        .venue-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            color: white;
+            padding: 0.4rem 1.3rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(13,148,136,0.3);
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 0.6rem;
+            background: linear-gradient(135deg, #0f766e, #0d9488, #14b8a6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: var(--text-light);
+            margin-bottom: 1.8rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .authors {
+            margin: 1.5rem auto 1rem;
+            font-size: 1.05rem;
+            line-height: 2;
+            max-width: 850px;
+            font-weight: 500;
+        }
+
+        .author-name { display: inline; }
+        .author-name:hover { color: var(--primary); }
+        .author-name sup { font-size: 0.7em; color: var(--primary); font-weight: 700; }
+        .author-separator { margin: 0 0.2rem; color: #9ca3af; }
+
+        .affiliations {
+            margin: 1rem auto 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            max-width: 700px;
+        }
+
+        .affiliation { display: block; margin-bottom: 0.2rem; }
+        .affiliation sup { font-size: 0.8em; color: var(--primary); font-weight: 700; margin-right: 0.2rem; }
+
+        /* Resource Buttons */
+        .resource-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .resource-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.6rem 1.3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            box-shadow: var(--shadow);
+        }
+
+        .resource-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .resource-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Nav */
+        nav {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 0.8rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            padding: 0.4rem 1rem;
+            position: relative;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        nav a:hover { color: var(--primary); }
+        nav a:hover::after { width: 100%; }
+
+        /* Container */
+        .container { max-width: 1050px; margin: 0 auto; padding: 2rem; }
+
+        /* Sections */
+        section {
+            margin-bottom: 3.5rem;
+            scroll-margin-top: 70px;
+        }
+
+        section h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 3px solid var(--primary-light);
+            display: inline-block;
+        }
+
+        section p {
+            font-size: 1.02rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        /* Image */
+        .image-container {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .image-caption {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .highlight-box h3 { color: var(--primary); margin-bottom: 0.8rem; font-size: 1.2rem; }
+
+        .highlight-box ul { list-style: none; padding-left: 0; }
+
+        .highlight-box li {
+            padding: 0.6rem 1rem 0.6rem 2.2rem;
+            margin-bottom: 0.4rem;
+            background: var(--bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .highlight-box li::before {
+            content: '\2713';
+            position: absolute;
+            left: 0.8rem;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        /* Finding Cards */
+        .finding-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .finding-card {
+            background: var(--bg);
+            padding: 1.8rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--primary);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .finding-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .finding-card:nth-child(1) { border-top-color: #0d9488; }
+        .finding-card:nth-child(2) { border-top-color: #f59e0b; }
+        .finding-card:nth-child(3) { border-top-color: #8b5cf6; }
+
+        .finding-icon { font-size: 2.2rem; margin-bottom: 0.6rem; display: block; }
+
+        .finding-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.6rem;
+        }
+
+        .finding-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .finding-takeaway {
+            background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            line-height: 1.5;
+        }
+
+        /* Results Table */
+        .results-table {
+            width: 100%;
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        .results-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.88rem;
+        }
+
+        .results-table th, .results-table td {
+            padding: 0.65rem 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .results-table td:first-child { text-align: left; font-weight: 500; padding-left: 0.8rem; }
+        .results-table tr:hover { background: var(--bg-alt); }
+
+        .best-result { font-weight: 700; color: var(--primary); }
+
+        /* Citation */
+        .citation-section {
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .citation-section p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .citation-block {
+            background: #0f172a;
+            padding: 1.2rem 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.84rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        /* Getting Started */
+        .code-block {
+            background: #1e293b;
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.7;
+            margin: 1rem 0;
+        }
+
+        .code-block .comment { color: #64748b; }
+        .code-block .cmd { color: #7dd3fc; }
+
+        /* Footer */
+        footer {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 1.5rem 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        footer a { color: var(--primary-light); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo-container { flex-wrap: wrap; gap: 1.5rem; }
+            .logo-bar img { height: 34px; }
+            header { padding: 2rem 1.5rem 1.5rem; }
+            h1 { font-size: 1.7rem; }
+            .finding-cards { grid-template-columns: 1fr; }
+            .resource-links { gap: 0.6rem; }
+            .resource-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+            nav a { padding: 0.3rem 0.6rem; font-size: 0.85rem; }
+            section h2 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation (fixed at top) -->
+    <nav>
+        <a href="#introduction">Introduction</a>
+        <a href="#framework">Framework</a>
+        <a href="#findings">Key Findings</a>
+        <a href="#results">Results</a>
+        <!-- <a href="#getting-started">Getting Started</a> -->
+        <a href="#citation">Citation</a>
+    </nav>
+
+    <header>
+        <div class="venue-badge">ICLR 2026</div>
+        <h1>MoMa: A Simple Modular Learning Framework<br>for Material Property Prediction</h1>
+        <p class="subtitle">Train specialized modules. Compose adaptively. Predict accurately.</p>
+
+        <div class="authors">
+            <span class="author-name">Botian Wang<sup>1,*</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Yawen Ouyang<sup>2,*</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Yaohui Li<sup>1,*</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Mianzhi Pan<sup>2</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Yuanhang Tang<sup>1</sup></span><span class="author-separator">,</span>
+            <br>
+            <span class="author-name">Yiqun Wang<sup>1</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Haorui Cui<sup>1</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Jianbing Zhang<sup>3</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Xiaonan Wang<sup>3</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Wei-Ying Ma<sup>1</sup></span><span class="author-separator">,</span>
+            <span class="author-name">Hao Zhou<sup>1,&dagger;</sup></span>
+        </div>
+
+        <div class="affiliations">
+            <span class="affiliation"><sup>1</sup>Institute for AI Industry Research (AIR), Tsinghua University</span>
+            <span class="affiliation"><sup>2</sup>School of Artificial Intelligence, Nanjing University</span>
+            <span class="affiliation"><sup>3</sup>Department of Chemical Engineering, Tsinghua University</span>
+            <span class="affiliation" style="margin-top: 0.4rem; font-style: italic; font-size: 0.85rem;">*Equal Contribution &nbsp;&nbsp; <sup>&dagger;</sup>Corresponding Author</span>
+            <span class="affiliation" style="font-size: 0.85rem;">Contact: <a href="mailto:zhouhao@air.tsinghua.edu.cn" style="color: var(--primary); text-decoration: none;">zhouhao@air.tsinghua.edu.cn</a></span>
+        </div>
+
+        <div class="resource-links">
+            <a href="https://arxiv.org/abs/2502.15483" class="resource-btn" target="_blank">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Paper
+            </a>
+            <a href="https://github.com/Thomaswbt/MoMa" class="resource-btn" target="_blank">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                Code
+            </a>
+            <a href="https://huggingface.co/GenSI/MoMa-modules-ICLR" class="resource-btn" target="_blank">
+                <span style="font-size: 1.1rem;">🤗</span>
+                Modules
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Introduction -->
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>
+                Material property prediction is critical for accelerating materials discovery, yet material tasks exhibit significant
+                <strong>diversity</strong> (spanning electronic, thermal, mechanical properties across crystals, molecules, and more)
+                and <strong>disparity</strong> (governed by distinct physical laws). Naively pre-train then fine-tune
+                often fails to address these challenges, where a monolithic model suffers from <strong>negative transfer</strong>.
+            </p>
+            <p>
+                <strong>MoMa</strong> (<strong>Mo</strong>dular learning for <strong>Ma</strong>terials) reframes learning as <strong>modular composition</strong>.
+                Instead of forcing all tasks into one shared model, MoMa trains specialized modules on diverse high-resource tasks and
+                adaptively composes synergistic modules tailored to each downstream scenario, enabling effective knowledge reuse while mitigating interference.
+            </p>
+
+            <div class="highlight-box">
+                <h3>Highlights</h3>
+                <ul>
+                    <li><strong>14% average improvement</strong> over the strongest baseline across 17 material property prediction tasks</li>
+                    <li><strong>Best in 16 out of 17</strong> tasks, spanning electronic, thermal, mechanical, and phonon-related properties</li>
+                    <li><strong>18 open-source modules</strong> released on <a href="https://huggingface.co/GenSI/MoMa-modules-ICLR" style="color: var(--primary); font-weight: 600;">Hugging Face</a> for community reuse</li>
+                    <li>Superior <strong>few-shot performance</strong> under realistic label scarcity</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Framework -->
+        <section id="framework">
+            <h2>Framework</h2>
+            <p>
+                MoMa operates in two stages: (1) <strong>Module Training &amp; Centralization</strong>, which distills transferable
+                knowledge from diverse high-resource tasks into a shared MoMa Hub; and (2) <strong>Adaptive Module Composition (AMC)
+                &amp; Fine-tuning</strong>, where MoMa selects and weights modules via a training-free kNN estimator and convex optimization, then fine-tunes the composed model.
+            </p>
+
+            <div class="image-container">
+                <img src="../asset/moma_framework.png" alt="MoMa Framework">
+                <p class="image-caption">
+                    The MoMa framework. (a) Module Training &amp; Centralization: train specialized modules and store them in MoMa Hub.
+                    (b) Adaptive Module Composition: estimate module relevance via kNN, optimize composition weights, and fine-tune.
+                </p>
+            </div>
+        </section>
+
+        <!-- Key Findings -->
+        <section id="findings">
+            <h2>Key Findings</h2>
+            <p>
+                Beyond strong empirical performance, our analysis reveals three insights about modular material learning:
+            </p>
+
+            <div class="finding-cards">
+                <div class="finding-card">
+                    <span class="finding-icon">📈</span>
+                    <div class="finding-title">Scaling Law of Modules</div>
+                    <div class="finding-desc">
+                        MoMa improves monotonically as more modules are added to the hub, showing strong and predictable scaling behavior.
+                    </div>
+                    <div class="finding-takeaway">More modules = better performance</div>
+                </div>
+
+                <div class="finding-card">
+                    <span class="finding-icon">🎯</span>
+                    <div class="finding-title">Few-Shot Superiority</div>
+                    <div class="finding-desc">
+                        MoMa's advantage becomes more pronounced in few-shot settings, highlighting data efficiency under label scarcity.
+                    </div>
+                    <div class="finding-takeaway">Greatest gains where labeled data is scarce</div>
+                </div>
+
+                <div class="finding-card">
+                    <span class="finding-icon">🔍</span>
+                    <div class="finding-title">Interpretable Insights</div>
+                    <div class="finding-desc">
+                        The learned composition weights reveal meaningful relationships between material properties.
+                    </div>
+                    <div class="finding-takeaway">Composition weights encode transferable material knowledge</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section id="results">
+            <h2>Results</h2>
+            <p>
+                Evaluation across <strong>17 downstream material property prediction tasks</strong>. All results are the average of five data splits (MAE).
+            </p>
+
+            <div class="image-container">
+                <img src="../asset/moma_results.png" alt="MoMa Main Results">
+                <p class="image-caption">
+                    Main results for 17 material property prediction tasks. MoMa (Full) achieves the best average rank of 1.35, outperforming all baselines with an average improvement of 14%.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- Getting Started -->
+        <!-- <section id="getting-started">
+            <h2>Getting Started</h2>
+            <p>Clone the repository, install the environment, download the pretrained modules, and start fine-tuning:</p>
+            <div class="code-block"><span class="comment"># Clone and install</span>
+<span class="cmd">git clone</span> https://github.com/Xiaonan-Wang-AIR/MoMa.git && <span class="cmd">cd</span> MoMa
+<span class="cmd">conda env create</span> -f environment.yml && <span class="cmd">conda activate</span> moma && <span class="cmd">pip install</span> -e .
+
+<span class="comment"># Download JMP-L backbone</span>
+<span class="cmd">wget</span> -O jmp-l.pt https://jmp-iclr-datasets.s3.amazonaws.com/jmp-l.pt
+
+<span class="comment"># Download MoMa Hub modules (18 x 615MB)</span>
+<span class="cmd">pip install</span> huggingface_hub
+<span class="cmd">hf download</span> GenSI/MoMa-modules-ICLR --repo-type model --local-dir ./hub
+
+<span class="comment"># Fine-tune with MoMa</span>
+<span class="cmd">bash</span> scripts/finetune_moma.sh</div>
+        </section> -->
+
+        <!-- Citation -->
+        <section id="citation">
+            <h2>Citation</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">If you find this work useful, please cite our paper:</p>
+            <div class="citation-section">
+                <div class="citation-block">@article{wang2025moma,
+  title={MoMa: A Modular Deep Learning Framework for Material Property Prediction},
+  author={Wang, Botian and Ouyang, Yawen and Li, Yaohui and Pan, Mianzhi and Tang, Yuanhang and Wang, Yiqun and Cui, Haorui and Zhang, Jianbing and Wang, Xiaonan and Ma, Wei-Ying and Zhou, Hao},
+  journal={arXiv preprint arXiv:2502.15483},
+  year={2025}
+}</div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025&ndash;2026 MoMa &mdash; Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></p>
+        <p>
+            <a href="https://github.com/Xiaonan-Wang-AIR/MoMa" target="_blank">GitHub</a> &nbsp;|&nbsp;
+            <a href="https://huggingface.co/GenSI/MoMa-modules-ICLR" target="_blank">Hugging Face</a> &nbsp;|&nbsp;
+            <a href="https://arxiv.org/abs/2502.15483" target="_blank">arXiv</a>
+        </p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(15px)';
+            section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(section);
+        });
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('section').forEach(section => {
+                if (pageYOffset >= section.offsetTop - 200) current = section.getAttribute('id');
+            });
+            document.querySelectorAll('nav a').forEach(link => {
+                link.style.color = link.getAttribute('href') === `#${current}` ? 'var(--primary)' : '';
+            });
+        });
+    </script>
+</body>
+</html>
