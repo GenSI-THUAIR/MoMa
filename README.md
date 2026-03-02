@@ -29,11 +29,11 @@ Welcome to MoMa (**Mo**dular learning for **Ma**terials), a simple yet powerful 
 
 Instead of forcing all tasks into one shared model, MoMa **reframes learning as modular composition**. It adopts a two-stage pipeline: (1) **Module Training & Centralization**, which distills transferable knowledge from diverse high-resource tasks into a shared module hub, and (2) **Adaptive Module Composition and Downstream Fine-tuning**, where MoMa selects and weights modules based on their intrinsic alignment with the target task. The composed model is then fine-tuned for adaptation. Together, this design enables effective knowledge reuse while mitigating interference.
 
-<img src="asset/moma_framework.png" width="100%">
+<img src="docs/asset/moma_framework.png" width="100%">
 
 We evaluate MoMa on 17 material property prediction tasks **spanning electronic, thermal, mechanical, and phonon-related properties**. MoMa achieves consistent and substantial improvements, outperforming baselines with an average improvement of **14%**. 
 
-<img src="asset/moma_results.png" width="90%">
+<img src="docs/asset/moma_results.png" width="90%">
 
 Beyond performance, our analysis reveals three key findings:
 1.	**The scaling law of modules**: MoMa improves monotonically as more modules are added to the hub, showing strong scaling behavior.
