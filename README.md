@@ -145,10 +145,12 @@ This work is licensed under the [Attribution-NonCommercial 4.0 International (CC
 If you refer to MoMa in your research, please cite our paper:
 
 ```bibtex
-@article{wang2025moma,
-  title={MoMa: A Modular Deep Learning Framework for Material Property Prediction},
-  author={Wang, Botian and Ouyang, Yawen and Li, Yaohui and Wang, Yiqun and Cui, Haorui and Zhang, Jianbing and Wang, Xiaonan and Ma, Wei-Ying and Zhou, Hao},
-  journal={arXiv preprint arXiv:2502.15483},
-  year={2025}
+@inproceedings{wang2026moma,
+  title={MoMa: A Simple Modular Learning Framework for Material Property Prediction},
+  author={Wang, Botian and Ouyang, Yawen and Li, Yaohui and Pan, Mianzhi and Cui, Haorui and Wang, Yiqun and Zhang, Jianbing and Wang, Xiaonan and Ma, Wei-Ying and Zhou, Hao and others},
+  booktitle={International Conference on Learning Representations},
+  volume={2026},
+  pages={45830--45855},
+  year={2026}
 }
 ```
